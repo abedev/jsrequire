@@ -3,5 +3,5 @@
 -cp test
 -main Main
 -lib utest
---macro jsrequire.JSRequire.updateNpm()
+--macro jsrequire.JSRequire.updateNpm(true)
 -cmd node bin/test.js
