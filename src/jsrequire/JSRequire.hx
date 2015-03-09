@@ -7,10 +7,19 @@ import haxe.macro.ExprTools;
 
 class JSRequire {
   macro public static function updateNpm(?createPackageJson : Bool) {
+    installNpmDependencies(createPackageJson);
+    return macro null;
+  }
+
+  public static function installNpmDependencies(?createPackageJson : Bool) {
     Context.onGenerate(function(types : Array<Type>) {
       var modules = [];
       for(type in types) switch type {
         case TInst(t, _):
+          var s = t.toString();
+          // skip node natives
+          if(s.substring(0, 8) == "js.node.")
+            continue;
           var meta = t.get().meta;
           if(!meta.has(":jsRequire"))
             continue;
@@ -31,7 +40,6 @@ class JSRequire {
 
       return;
     });
-    return null;
   }
 
   static function ensurePackageJson(generate : Bool) {
@@ -50,8 +58,6 @@ class JSRequire {
     return null != dependencies ? dependencies : {};
   }
 
-  static function installNpmModule(module : String) {
-    trace(module);
+  static function installNpmModule(module : String)
     Sys.command('npm', ['install', '--save', module]);
-  }
 }
