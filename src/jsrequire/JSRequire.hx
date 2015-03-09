@@ -1,0 +1,5 @@
+package jsrequire;
+
+class JSRequire {
+  
+}
