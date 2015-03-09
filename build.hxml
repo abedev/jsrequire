@@ -1,8 +1,7 @@
--cmd rm -rf node_modules
 -js bin/test.js
 -cp src
 -cp test
 -main Main
 -lib utest
--macro jsrequire.JSRequire.updateNpm()
+--macro jsrequire.JSRequire.updateNpm()
 -cmd node bin/test.js
