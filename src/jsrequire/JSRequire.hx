@@ -6,7 +6,7 @@ import haxe.macro.Type;
 import haxe.macro.ExprTools;
 
 class JSRequire {
-  macro public static function updateNpm(?createPackageJson : Bool) {
+  macro public static function npmInstall(?createPackageJson : Bool) {
     installNpmDependencies(createPackageJson);
     return macro null;
   }
@@ -30,11 +30,11 @@ class JSRequire {
         case _:
       }
       if(modules.length > 0) {
-        ensurePackageJson(null != createPackageJson && createPackageJson);
-        var installedDependencies = getDependencies();
+        var hasPackageJson = ensurePackageJson(null != createPackageJson && createPackageJson);
+        var installedDependencies = getDependencies(hasPackageJson);
         for(module in modules) {
           if(!Reflect.hasField(installedDependencies, module))
-            installNpmModule(module);
+            installNpmModule(module, hasPackageJson);
         }
       }
 
@@ -43,21 +43,42 @@ class JSRequire {
   }
 
   static function ensurePackageJson(generate : Bool) {
-    if(sys.FileSystem.exists("package.json")) return;
+    if(sys.FileSystem.exists("package.json")) return true;
     if(generate) {
       Sys.command('npm', ['init', '.']);
     }
-    if(!sys.FileSystem.exists("package.json")) {
-      Context.error("This project does not contain the file `package.json` please generate one manually or using `npm init .`", Context.currentPos());
+    return sys.FileSystem.exists("package.json");
+  }
+
+  static function getDependencies(hasPackageJson : Bool) : Dynamic<String> {
+    if(hasPackageJson) {
+      return getDependenciesFromPackageJson();
+    } else {
+      return getDependenciesFromNodeModules();
     }
   }
 
-  static function getDependencies() : Dynamic<String> {
+  static function getDependenciesFromPackageJson() : Dynamic<String> {
     var json = haxe.Json.parse(sys.io.File.getContent("package.json")),
         dependencies : Dynamic<String> = json.dependencies;
     return null != dependencies ? dependencies : {};
   }
 
-  static function installNpmModule(module : String)
-    Sys.command('npm', ['install', '--save', module]);
+  static function getDependenciesFromNodeModules() : Dynamic<String> {
+    var dir = "node_modules";
+    if(!sys.FileSystem.exists(dir))
+      return {};
+    var ob = {};
+    for(file in sys.FileSystem.readDirectory(dir)) {
+      if(file == "." || file == "..") continue;
+      Reflect.setField(ob, file, "*");
+    }
+    return ob;
+  }
+
+  static function installNpmModule(module : String, hasPackageJson : Bool)
+    if(hasPackageJson)
+      Sys.command('npm', ['install', '--save', module]);
+    else
+      Sys.command('npm', ['install', module]);
 }
