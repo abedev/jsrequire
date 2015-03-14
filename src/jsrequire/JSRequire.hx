@@ -51,15 +51,34 @@ class JSRequire {
   }
 
   static function getDependencies(hasPackageJson : Bool) : Dynamic<String> {
+    if(hasPackageJson) {
+      return getDependenciesFromPackageJson();
+    } else {
+      return getDependenciesFromNodeModules();
     }
   }
 
-  static function getDependencies() : Dynamic<String> {
+  static function getDependenciesFromPackageJson() : Dynamic<String> {
     var json = haxe.Json.parse(sys.io.File.getContent("package.json")),
         dependencies : Dynamic<String> = json.dependencies;
     return null != dependencies ? dependencies : {};
   }
 
-  static function installNpmModule(module : String)
-    Sys.command('npm', ['install', '--save', module]);
+  static function getDependenciesFromNodeModules() : Dynamic<String> {
+    var dir = "node_modules";
+    if(!sys.FileSystem.exists(dir))
+      return {};
+    var ob = {};
+    for(file in sys.FileSystem.readDirectory(dir)) {
+      if(file == "." || file == "..") continue;
+      Reflect.setField(ob, file, "*");
+    }
+    return ob;
+  }
+
+  static function installNpmModule(module : String, hasPackageJson : Bool)
+    if(hasPackageJson)
+      Sys.command('npm', ['install', '--save', module]);
+    else
+      Sys.command('npm', ['install', module]);
 }
