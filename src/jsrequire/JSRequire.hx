@@ -6,7 +6,7 @@ import haxe.macro.Type;
 import haxe.macro.ExprTools;
 
 class JSRequire {
-  macro public static function updateNpm(?createPackageJson : Bool) {
+  macro public static function npmInstall(?createPackageJson : Bool) {
     installNpmDependencies(createPackageJson);
     return macro null;
   }
