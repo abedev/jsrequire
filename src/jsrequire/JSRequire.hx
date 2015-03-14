@@ -43,12 +43,11 @@ class JSRequire {
   }
 
   static function ensurePackageJson(generate : Bool) {
-    if(sys.FileSystem.exists("package.json")) return;
+    if(sys.FileSystem.exists("package.json")) return true;
     if(generate) {
       Sys.command('npm', ['init', '.']);
     }
-    if(!sys.FileSystem.exists("package.json")) {
-      Context.error("This project does not contain the file `package.json` please generate one manually or using `npm init .`", Context.currentPos());
+    return sys.FileSystem.exists("package.json");
     }
   }
 
