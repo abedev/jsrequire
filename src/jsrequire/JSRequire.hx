@@ -30,11 +30,11 @@ class JSRequire {
         case _:
       }
       if(modules.length > 0) {
-        ensurePackageJson(null != createPackageJson && createPackageJson);
-        var installedDependencies = getDependencies();
+        var hasPackageJson = ensurePackageJson(null != createPackageJson && createPackageJson);
+        var installedDependencies = getDependencies(hasPackageJson);
         for(module in modules) {
           if(!Reflect.hasField(installedDependencies, module))
-            installNpmModule(module);
+            installNpmModule(module, hasPackageJson);
         }
       }
 
@@ -48,6 +48,9 @@ class JSRequire {
       Sys.command('npm', ['init', '.']);
     }
     return sys.FileSystem.exists("package.json");
+  }
+
+  static function getDependencies(hasPackageJson : Bool) : Dynamic<String> {
     }
   }
 
