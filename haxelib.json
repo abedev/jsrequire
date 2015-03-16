@@ -6,11 +6,8 @@
   "tags": ["nodejs", "npm"],
   "description": "Small utility to get @:jsRequire dependencies automatically installed",
   "releasenote": "First release.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "contributors": ["fponticelli"],
   "dependencies" : {
-    "thx.core" : "",
-    "hxnodejs" : "",
-    "express" : ""
   }
 }
