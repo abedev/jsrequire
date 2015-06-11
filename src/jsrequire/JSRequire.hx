@@ -6,7 +6,11 @@ import haxe.macro.Type;
 import haxe.macro.ExprTools;
 
 class JSRequire {
-  macro public static function npmInstall(?createPackageJson : Bool) {
+
+  static var packageJsonPath = 'package.json';
+
+  macro public static function npmInstall(?createPackageJson : Bool,?jsonPath:String) {
+    if (jsonPath != null) packageJsonPath = jsonPath;
     installNpmDependencies(createPackageJson);
     return macro null;
   }
@@ -43,11 +47,11 @@ class JSRequire {
   }
 
   static function ensurePackageJson(generate : Bool) {
-    if(sys.FileSystem.exists("package.json")) return true;
+    if(sys.FileSystem.exists(packageJsonPath)) return true;
     if(generate) {
       Sys.command('npm', ['init', '.']);
     }
-    return sys.FileSystem.exists("package.json");
+    return sys.FileSystem.exists(packageJsonPath);
   }
 
   static function getDependencies(hasPackageJson : Bool) : Dynamic<String> {
@@ -59,7 +63,7 @@ class JSRequire {
   }
 
   static function getDependenciesFromPackageJson() : Dynamic<String> {
-    var json = haxe.Json.parse(sys.io.File.getContent("package.json")),
+    var json = haxe.Json.parse(sys.io.File.getContent(packageJsonPath)),
         dependencies : Dynamic<String> = json.dependencies;
     return null != dependencies ? dependencies : {};
   }
