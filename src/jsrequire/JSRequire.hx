@@ -59,7 +59,10 @@ class JSRequire {
   }
 
   static function getDependenciesFromPackageJson() : Dynamic<String> {
-    var json = haxe.Json.parse(sys.io.File.getContent("package.json")),
+    var content = sys.io.File.getContent("package.json"),
+        json = try haxe.Json.parse(content) catch(e : Dynamic) {
+          return throw 'Unable to parse package.json: \n\n$content\n\n$e';
+        },
         dependencies : Dynamic<String> = json.dependencies;
     return null != dependencies ? dependencies : {};
   }
