@@ -27,7 +27,7 @@ class JSRequire {
           if(module.substring(0, 1) != '"')
             Context.error('Class definition contains an invalid module value', t.get().pos);
           if (module.split("/")[1] != null) {
-            module = module.split("/")[0];
+            module = module.split("/")[0] + '"';
           }
           modules.push(module.substring(1, module.length - 1));
         case _:
